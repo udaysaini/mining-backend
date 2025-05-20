@@ -14,7 +14,12 @@ def create_app():
 
     db.init_app(app)
 
+    # Register the blueprints for the routes
     from .routes import main as main_blueprint;
     app.register_blueprint(main_blueprint);
+
+    # Regsister the error handlers
+    from .errors import register_error_handlers;
+    register_error_handlers(app);
 
     return app;
