@@ -17,6 +17,10 @@ def should_init_db():
         if not os.path.exists(db_path) or os.path.getsize(db_path) < 100:
             return True
 
+    # Always initialize in Railway environment
+    if os.environ.get("RAILWAY_ENVIRONMENT"):
+        return True
+
     return False
 
 
