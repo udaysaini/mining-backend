@@ -78,3 +78,54 @@ def format_time_field(t, field_name):
             "Failed to format field '%s': %r — %s", field_name, t, e
         )
         return None
+
+
+def parse_date_string(date_str, field_name=None):
+    """
+    Parse a date string into a date object.
+
+    Args:
+        date_str: String representation of date (e.g., "YYYY-MM-DD")
+        field_name: Optional name of the field for error messages
+
+    Returns:
+        datetime.date object or None if date_str is None
+    """
+    if not date_str:
+        return None
+
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        error_msg = "Invalid date format"
+        if field_name:
+            error_msg += f" for {field_name}"
+        error_msg += ". Use YYYY-MM-DD"
+        abort(400, description=error_msg)
+
+
+def format_date_field(date_obj):
+    """
+    Format a date object to a string in YYYY-MM-DD format.
+    """
+    if date_obj is None:
+        return None
+    if isinstance(date_obj, str):
+        try:
+            # Validate if the string is already in the correct format or parseable
+            parsed_date = datetime.strptime(date_obj, "%Y-%m-%d").date()
+            return parsed_date.strftime("%Y-%m-%d")
+        except ValueError:
+            current_app.logger.error(f"Invalid date string for formatting: {date_obj}")
+            return None  # Or raise an error, or return original string
+    elif isinstance(
+        date_obj, datetime
+    ):  # Handle datetime objects by converting to date
+        return date_obj.date().strftime("%Y-%m-%d")
+    elif hasattr(date_obj, "strftime"):  # Handles date objects
+        return date_obj.strftime("%Y-%m-%d")
+    else:
+        current_app.logger.error(
+            f"Unsupported type for date formatting: {type(date_obj)}"
+        )
+        return None

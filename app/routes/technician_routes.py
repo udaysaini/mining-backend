@@ -11,13 +11,13 @@ technician_bp = Blueprint("technicians", __name__, url_prefix="/technicians")
 # Route to get all technicians
 @technician_bp.route("", methods=["POST"])
 def create_technician():
+    print("POST Request: Create Technician")
     data = request.get_json()
+    print("Data received:", data)
 
     # Validate required fields
     if not data or "name" not in data:
         abort(400, "Missing required fields: name")
-
-    print("Data received:", data)
 
     # Parse time strings and prevent SQLite errors
     available_from = parse_time_string(data.get("available_from"), "available_from")
@@ -50,6 +50,7 @@ def create_technician():
 
 @technician_bp.route("", methods=["GET"])
 def get_technicians():
+    print("GET Request: All Technicians")
     # Get all technicians from the database
     technicians = Technician.query.all()
 
@@ -80,6 +81,7 @@ def get_technicians():
 
 @technician_bp.route("/<int:technician_id>", methods=["GET"])
 def get_technician(technician_id):
+    print("GET Request : Technician ID:", technician_id)
     # get a specific technician by ID
     technician = Technician.query.get_or_404(
         technician_id, description=f"No technician found with id={technician_id}"
@@ -110,6 +112,8 @@ def get_technician(technician_id):
 
 @technician_bp.route("/<int:technician_id>", methods=["PUT"])
 def update_technician(technician_id):
+    print("PUT Request : Technician ID:", technician_id)
+
     # fetch the technician by ID
     technician = Technician.query.get_or_404(
         technician_id, description=f"No technician found with id={technician_id}"
@@ -165,6 +169,8 @@ def update_technician(technician_id):
 
 @technician_bp.route("/<int:technician_id>", methods=["DELETE"])
 def delete_technician(technician_id):
+    print("Delete Request: Technician ID:", technician_id)
+
     # Fetch the technician by ID
     technician = Technician.query.get_or_404(
         technician_id, description=f"No technician found with id={technician_id}"
