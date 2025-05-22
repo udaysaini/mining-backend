@@ -64,9 +64,12 @@ def get_all_equipment():
             "id": equip.id,
             "name": equip.name,
             "type": equip.type,
+            "location": equip.location,
             "status": equip.status,
-            "available_from": format_time_field(equip.available_from),
-            "available_to": format_time_field(equip.available_to),
+            "last_maintenance": (
+                equip.last_maintenance.isoformat() if equip.last_maintenance else None
+            ),
+            "assigned_to": equip.assigned_to,  # Use the corrected column name
         }
         for equip in equipment_list
     ]
@@ -158,7 +161,7 @@ def assign_equipment_to_technician(equipment_id, technician_id):
         abort(404, "Technician not found")
 
     # Assign the equipment to the technician
-    equipment.assigned_to = technician.id
+    equipment.assigned_to = technician.id  # Updated to use the correct column name
     db.session.commit()
 
     return jsonify({"message": "Equipment assigned successfully"}), 200
@@ -174,7 +177,7 @@ def unassign_equipment_from_technician(equipment_id):
         abort(404, "Equipment not found")
 
     # Unassign the equipment from the technician
-    equipment.assigned_to = None
+    equipment.assigned_to = None  # Updated to use the correct column name
     db.session.commit()
 
     return jsonify({"message": "Equipment unassigned successfully"}), 200
@@ -184,7 +187,9 @@ def unassign_equipment_from_technician(equipment_id):
 @equipment_bp.route("/technician/<int:technician_id>", methods=["GET"])
 def get_equipment_by_technician(technician_id):
     print(f"GET Request: Get Equipment assigned to Technician ID {technician_id}")
-    equipment_list = Equipment.query.filter_by(assigned_to=technician_id).all()
+    equipment_list = Equipment.query.filter_by(
+        assigned_to=technician_id
+    ).all()  # Updated to use the correct column name
 
     # Format the equipment data for the response
     formatted_equipment = [
